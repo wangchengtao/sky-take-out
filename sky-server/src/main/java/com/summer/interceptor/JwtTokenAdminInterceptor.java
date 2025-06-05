@@ -1,6 +1,7 @@
 package com.summer.interceptor;
 
 import com.summer.constant.JwtClaimsConstant;
+import com.summer.context.BaseContext;
 import com.summer.properties.JwtProperties;
 import com.summer.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -37,6 +38,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
 
             log.info("当前员工 id: {}", empId);
+            BaseContext.setCurrentId(empId);
 
             return true;
         } catch (Exception e) {

@@ -3,6 +3,7 @@ package com.summer.service.impl;
 import com.summer.constant.MessageConstant;
 import com.summer.constant.PasswordConstant;
 import com.summer.constant.StatusConstant;
+import com.summer.context.BaseContext;
 import com.summer.dto.EmployeeDTO;
 import com.summer.dto.EmployeeLoginDTO;
 import com.summer.entity.Employee;
@@ -63,8 +64,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setCreateTime(LocalDateTime.now());
         employee.setUpdateTime(LocalDateTime.now());
 
-        employee.setCreateUser(10L);
-        employee.setUpdateUser(10L);
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.insert(employee);
     }
