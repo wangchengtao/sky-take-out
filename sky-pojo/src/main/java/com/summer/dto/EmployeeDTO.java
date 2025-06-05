@@ -10,6 +10,9 @@ import java.io.Serializable;
 @ApiModel(description = "员工信息")
 public class EmployeeDTO implements Serializable {
 
+    @ApiModelProperty(value = "主键", example = "1", required = true)
+    private Long id;
+
     @ApiModelProperty(value = "用户名", example = "xiaozhi", required = true)
     private String username;
 
