@@ -37,7 +37,8 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     }
 
     @Bean
-    public Docket docket() {
+    public Docket docket1() {
+        log.info("准备生成管理端接口文档...");
         ApiInfo apiInfo = new ApiInfoBuilder()
                 .title("外卖接口文档")
                 .version("2.0")
@@ -45,9 +46,28 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .build();
 
         return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("管理后台")
                 .apiInfo(apiInfo)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.summer.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.summer.controller.admin"))
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+    @Bean
+    public Docket docket2() {
+        log.info("准备生成用户端接口文档...");
+        ApiInfo apiInfo = new ApiInfoBuilder()
+                .title("外卖接口文档")
+                .version("2.0")
+                .description("用户端")
+                .build();
+
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("用户端")
+                .apiInfo(apiInfo)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.summer.controller.user"))
                 .paths(PathSelectors.any())
                 .build();
     }
