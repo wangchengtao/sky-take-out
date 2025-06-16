@@ -1,6 +1,7 @@
 package com.summer.config;
 
 import com.summer.interceptor.JwtTokenAdminInterceptor;
+import com.summer.interceptor.JwtTokenUserInterceptor;
 import com.summer.json.JacksonObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Autowired
     private JwtTokenAdminInterceptor jwtTokenAdminInterceptor;
 
+    @Autowired
+    private JwtTokenUserInterceptor jwtTokenUserInterceptor;
+
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
         log.info("开始注册自定义拦截器");
@@ -34,6 +38,11 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         registry.addInterceptor(jwtTokenAdminInterceptor)
                 .addPathPatterns("/admin/**")
                 .excludePathPatterns("/admin/auth/login");
+
+        registry.addInterceptor(jwtTokenUserInterceptor)
+                .addPathPatterns("/user/**")
+                .excludePathPatterns("/user/auth/login")
+                .excludePathPatterns("/user/shop/status");
     }
 
     @Bean

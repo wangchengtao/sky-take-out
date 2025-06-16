@@ -2,6 +2,7 @@ package com.summer.service;
 
 import com.summer.dto.DishDTO;
 import com.summer.dto.DishPageQueryDTO;
+import com.summer.entity.Dish;
 import com.summer.result.PageResult;
 import com.summer.vo.DishVO;
 
@@ -17,4 +18,6 @@ public interface DishService {
     DishVO getByIdWithFlavor(Long id);
 
     void updateWithFlavor(DishDTO dishDTO);
+
+    List<DishVO> listWithFlavor(Dish dish);
 }
