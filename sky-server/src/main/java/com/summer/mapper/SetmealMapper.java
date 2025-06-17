@@ -24,4 +24,13 @@ public interface SetmealMapper {
     List<Long> getSetmealIdsByDishIds(List<Long> ids);
 
     List<Setmeal> list(Setmeal setmeal);
+
+    void insert(Setmeal setmeal);
+
+    @Select("select * from setmeal where id = #{id}")
+    Setmeal getById(Long id);
+
+    void deleteBatch(List<Long> ids);
+
+    void update(Setmeal setmeal);
 }
