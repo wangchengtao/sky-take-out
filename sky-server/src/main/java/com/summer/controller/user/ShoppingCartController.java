@@ -1,16 +1,16 @@
 package com.summer.controller.user;
 
 import com.summer.dto.ShoppingCartDTO;
+import com.summer.entity.ShoppingCart;
 import com.summer.result.Result;
 import com.summer.service.ShoppingCartService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("user/shoppingCart")
@@ -30,5 +30,11 @@ public class ShoppingCartController {
         shoppingCartService.addShoppingCart(shoppingCartDTO);
 
         return Result.success();
+    }
+
+    @GetMapping("list")
+    @ApiOperation("购物车列表")
+    public Result<List<ShoppingCart>> list() {
+        return Result.success(shoppingCartService.showShoppingCart());
     }
 }
