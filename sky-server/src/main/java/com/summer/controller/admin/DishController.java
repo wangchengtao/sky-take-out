@@ -10,13 +10,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
-@RestController
+@RestController("adminDishController")
 @RequestMapping("/admin/dish")
 @Api(tags = "菜品管理")
 @Slf4j
@@ -25,18 +24,13 @@ public class DishController {
     @Autowired
     private DishService dishService;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
     @PostMapping
     @ApiOperation(value = "新增菜品", produces = "application/json")
+    @CacheEvict(cacheNames = "dishCache", key = "#dishDTO.categoryId")
     public Result<Void> save(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品: {}", dishDTO);
 
         dishService.saveWithFlavor(dishDTO);
-
-        String key = "dish_" + dishDTO.getCategoryId();
-        cleanCache(key);
 
         return Result.success();
     }
@@ -53,12 +47,11 @@ public class DishController {
 
     @DeleteMapping
     @ApiOperation("批量删除")
+    @CacheEvict(cacheNames = "dishCache", allEntries = true)
     public Result<Void> delete(@RequestParam List<Long> ids) {
         log.info("批量删除: {}", ids);
 
         dishService.deleteBatch(ids);
-
-        cleanCache("dish_*");
 
         return Result.success();
     }
@@ -75,28 +68,21 @@ public class DishController {
 
     @PutMapping
     @ApiOperation("编辑")
+    @CacheEvict(cacheNames = "dishCache", key = "#dishDTO.categoryId")
     public Result<Void> update(@RequestBody DishDTO dishDTO) {
         log.info("编辑菜品信息：{}", dishDTO);
 
         dishService.updateWithFlavor(dishDTO);
-
-        cleanCache("dish_*");
 
         return Result.success();
     }
 
     @PostMapping("/status/{status}")
     @ApiOperation("起售停售")
+    @CacheEvict(cacheNames = "dishCache", allEntries = true)
     public Result<String> startOrStop(@PathVariable("status") Integer status, Long id) {
         dishService.startOrStop(status, id);
 
-        cleanCache("dish_*");
-
         return Result.success();
-    }
-
-    private void cleanCache(String pattern) {
-        Set<String> keys = redisTemplate.keys(pattern);
-        redisTemplate.delete(keys);
     }
 }
