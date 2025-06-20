@@ -1,8 +1,10 @@
 package com.summer.controller.user;
 
+import com.summer.dto.OrderPaymentDTO;
 import com.summer.dto.OrderSubmitDTO;
 import com.summer.result.Result;
 import com.summer.service.OrderService;
+import com.summer.vo.OrderPaymentVO;
 import com.summer.vo.OrderSubmitVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +32,17 @@ public class OrderController {
         OrderSubmitVO orderSubmitVO = orderService.submitOrder(orderSubmitDTO);
 
         return Result.success(orderSubmitVO);
+    }
+
+    @PostMapping("payment")
+    @ApiOperation("订单支付")
+    public Result<OrderPaymentVO> payment(@RequestBody OrderPaymentDTO orderPaymentDTO) throws Exception {
+        log.info("订单支付: {}", orderPaymentDTO);
+
+        OrderPaymentVO vo = orderService.payment(orderPaymentDTO);
+        log.info("支付结果: {}", vo);
+
+        return Result.success(vo);
     }
 
 }

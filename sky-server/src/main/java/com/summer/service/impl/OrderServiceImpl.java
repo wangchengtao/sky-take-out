@@ -1,25 +1,25 @@
 package com.summer.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.summer.constant.MessageConstant;
 import com.summer.context.BaseContext;
+import com.summer.dto.OrderPaymentDTO;
 import com.summer.dto.OrderSubmitDTO;
-import com.summer.entity.AddressBook;
-import com.summer.entity.OrderDetail;
-import com.summer.entity.Orders;
-import com.summer.entity.ShoppingCart;
+import com.summer.entity.*;
 import com.summer.execption.AddressBookBusinessException;
+import com.summer.execption.OrderBusinessException;
 import com.summer.execption.ShoppingCartBusinessException;
-import com.summer.mapper.AddressBookMapper;
-import com.summer.mapper.OrderDetailMapper;
-import com.summer.mapper.OrderMapper;
-import com.summer.mapper.ShoppingCartMapper;
+import com.summer.mapper.*;
 import com.summer.service.OrderService;
+import com.summer.utils.WeChatPayUtil;
+import com.summer.vo.OrderPaymentVO;
 import com.summer.vo.OrderSubmitVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +38,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private AddressBookMapper addressBookMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private WeChatPayUtil weChatPayUtil;
 
     @Override
     @Transactional
@@ -82,13 +88,49 @@ public class OrderServiceImpl implements OrderService {
 
         shoppingCartMapper.deleteByUserId(userId);
 
-        OrderSubmitVO vo = OrderSubmitVO.builder()
+        return OrderSubmitVO.builder()
                 .id(order.getId())
                 .orderNumber(order.getNumber())
                 .orderAmount(order.getAmount())
                 .orderTime(order.getOrderTime())
                 .build();
+    }
+
+    @Override
+    public OrderPaymentVO payment(OrderPaymentDTO orderPaymentDTO) throws Exception {
+        Long userId = BaseContext.getCurrentId();
+        User user = userMapper.getById(userId);
+
+        JSONObject jsonObject = weChatPayUtil.pay(orderPaymentDTO.getOrderNumber(), new BigDecimal("0.01"), "苍穹外卖订单", user.getOpenid());
+
+        if (jsonObject.getString("code") != null && jsonObject.getString("code").equals("ORDERPAID")) {
+            throw new OrderBusinessException("该订单已支付");
+        }
+
+        OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
+        vo.setPackageStr(jsonObject.getString("package"));
 
         return vo;
     }
+
+    /**
+     * 支付成功, 修改订单状态
+     */
+    @Override
+    public void paySuccess(String outTradeNo) {
+        Long userId = BaseContext.getCurrentId();
+
+        Orders orderDB = orderMapper.getByNumberAndUserId(outTradeNo, userId);
+
+        Orders orders = Orders.builder()
+                .id(orderDB.getId())
+                .status(Orders.TO_BE_CONFIRMED)
+                .payStatus(Orders.PAID)
+                .checkoutTime(LocalDateTime.now())
+                .build();
+
+        orderMapper.update(orders);
+    }
+
+
 }
