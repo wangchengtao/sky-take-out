@@ -1,5 +1,6 @@
 package com.summer.mapper;
 
+import com.summer.dto.GoodsSalesDTO;
 import com.summer.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -27,4 +28,6 @@ public interface OrderMapper {
     Double sumByMap(HashMap<String, Object> map);
 
     Integer countByMap(HashMap<String, Object> map);
+
+    List<GoodsSalesDTO> getTop10(LocalDateTime beginTime, LocalDateTime endTime);
 }

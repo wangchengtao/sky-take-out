@@ -66,4 +66,18 @@
             </if>
         </where>
     </select>
+    <select id="getTop10" resultType="com.summer.dto.GoodsSalesDTO">
+        select od.name As name,sum(od.number) AS number from order_detail od right join orders o
+        on od.order_id = o.id
+        and o.status = 5
+        <if test="begin != null">
+            and order_time &gt;= #{begin}
+        </if>
+        <if test="end != null">
+            and order_time &lt;= #{end}
+        </if>
+        group by name
+        order by number desc
+        limit 0, 10
+    </select>
 </mapper>

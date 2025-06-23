@@ -1,9 +1,11 @@
 package com.summer.service.impl;
 
+import com.summer.dto.GoodsSalesDTO;
 import com.summer.entity.Orders;
 import com.summer.mapper.OrderMapper;
 import com.summer.service.ReportService;
 import com.summer.vo.OrderReportVO;
+import com.summer.vo.SalesTop10ReportVO;
 import com.summer.vo.TurnoverReportVO;
 import com.summer.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -124,6 +126,22 @@ public class ReportServiceImpl implements ReportService {
                 .orderCompletionRate(rate)
                 .build();
 
+    }
+
+    @Override
+    public SalesTop10ReportVO getTop10(LocalDate begin, LocalDate end) {
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+
+        List<GoodsSalesDTO> goodsSalesDTOList = orderMapper.getTop10(beginTime, endTime);
+
+        String nameList = goodsSalesDTOList.stream().map(GoodsSalesDTO::getName).collect(Collectors.joining(","));
+        String numberList = goodsSalesDTOList.stream().map(GoodsSalesDTO::getNumber).map(String::valueOf).collect(Collectors.joining(","));
+
+        return SalesTop10ReportVO.builder()
+                .nameList(nameList)
+                .numberList(numberList)
+                .build();
     }
 
     private Integer getOrderCount(LocalDateTime beginTime, LocalDateTime endTime, Integer status) {

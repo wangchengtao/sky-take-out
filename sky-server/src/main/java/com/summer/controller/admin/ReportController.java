@@ -3,6 +3,7 @@ package com.summer.controller.admin;
 import com.summer.result.Result;
 import com.summer.service.ReportService;
 import com.summer.vo.OrderReportVO;
+import com.summer.vo.SalesTop10ReportVO;
 import com.summer.vo.TurnoverReportVO;
 import com.summer.vo.UserReportVO;
 import io.swagger.annotations.Api;
@@ -41,5 +42,11 @@ public class ReportController {
     @ApiOperation("订单统计")
     public Result<OrderReportVO> orderStatistics(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin, @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
         return Result.success(reportService.getOrder(begin, end));
+    }
+
+    @GetMapping("/Top10")
+    @ApiOperation("销量排名")
+    public Result<SalesTop10ReportVO> salesTop10(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin, @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+        return Result.success(reportService.getTop10(begin, end));
     }
 }
