@@ -3,6 +3,7 @@ package com.summer.service.impl;
 import com.summer.entity.Orders;
 import com.summer.mapper.OrderMapper;
 import com.summer.service.ReportService;
+import com.summer.vo.OrderReportVO;
 import com.summer.vo.TurnoverReportVO;
 import com.summer.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +83,56 @@ public class ReportServiceImpl implements ReportService {
                 .newUserList(newUsers.stream().map(String::valueOf).collect(Collectors.joining(",")))
                 .totalUserList(totalUsers.stream().map(String::valueOf).collect(Collectors.joining(",")))
                 .build();
+    }
+
+    @Override
+    public OrderReportVO getOrder(LocalDate begin, LocalDate end) {
+        ArrayList<LocalDate> localDates = new ArrayList<>();
+
+        do {
+            localDates.add(begin);
+            begin = begin.plusDays(1);
+        } while (!begin.equals(end));
+
+        ArrayList<Integer> orderCountList = new ArrayList<>();
+        ArrayList<Integer> validOrderCountList = new ArrayList<>();
+
+        for (LocalDate date : localDates) {
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
+            Integer orderCount = getOrderCount(beginTime, endTime, null);
+            Integer validOrderCount = getOrderCount(beginTime, endTime, Orders.COMPLETED);
+
+            orderCountList.add(orderCount);
+            validOrderCountList.add(validOrderCount);
+        }
+
+        Integer totalOrderCount = orderCountList.stream().reduce(Integer::sum).get();
+        Integer validOrderCount = validOrderCountList.stream().reduce(Integer::sum).get();
+
+        Double rate = 0.0;
+        if (totalOrderCount != 0) {
+            rate = validOrderCount.doubleValue() / totalOrderCount;
+        }
+
+        return OrderReportVO.builder()
+                .dateList(localDates.stream().map(LocalDate::toString).collect(Collectors.joining(",")))
+                .orderCountList(orderCountList.stream().map(String::valueOf).collect(Collectors.joining(",")))
+                .validOrderCountList(validOrderCountList.stream().map(String::valueOf).collect(Collectors.joining(",")))
+                .totalOrderCount(totalOrderCount)
+                .validOrderCount(validOrderCount)
+                .orderCompletionRate(rate)
+                .build();
+
+    }
+
+    private Integer getOrderCount(LocalDateTime beginTime, LocalDateTime endTime, Integer status) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("status", status);
+        map.put("begin", beginTime);
+        map.put("end", endTime);
+
+        return orderMapper.countByMap(map);
     }
 
     private Integer getUserCount(LocalDateTime beginTime, LocalDateTime endTime) {

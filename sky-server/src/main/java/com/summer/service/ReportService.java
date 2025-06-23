@@ -1,5 +1,6 @@
 package com.summer.service;
 
+import com.summer.vo.OrderReportVO;
 import com.summer.vo.TurnoverReportVO;
 import com.summer.vo.UserReportVO;
 
@@ -9,4 +10,6 @@ public interface ReportService {
     TurnoverReportVO getTurnover(LocalDate begin, LocalDate end);
 
     UserReportVO getUser(LocalDate begin, LocalDate end);
+
+    OrderReportVO getOrder(LocalDate begin, LocalDate end);
 }
