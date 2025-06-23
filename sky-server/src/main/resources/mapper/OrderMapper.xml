@@ -52,4 +52,18 @@
             </if>
         </where>
     </select>
+    <select id="countByMap" resultType="java.lang.Integer">
+        select count(id) from orders
+        <where>
+            <if test="status != null">
+                and orders.status = #{status}
+            </if>
+            <if test="begin != null">
+                and orders.create_time &gt;= #{begin}
+            </if>
+            <if test="end != null">
+                and orders.create_time &lt;= #{end}
+            </if>
+        </where>
+    </select>
 </mapper>

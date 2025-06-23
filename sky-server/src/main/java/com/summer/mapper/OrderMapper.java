@@ -25,4 +25,6 @@ public interface OrderMapper {
     Orders getById(long id);
 
     Double sumByMap(HashMap<String, Object> map);
+
+    Integer countByMap(HashMap<String, Object> map);
 }
