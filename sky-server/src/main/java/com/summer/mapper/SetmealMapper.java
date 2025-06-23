@@ -5,6 +5,7 @@ import com.summer.vo.DishItemVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -33,4 +34,6 @@ public interface SetmealMapper {
     void deleteBatch(List<Long> ids);
 
     void update(Setmeal setmeal);
+
+    Integer countByMap(HashMap<String, Object> map);
 }
